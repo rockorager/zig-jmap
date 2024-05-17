@@ -78,49 +78,49 @@ pub const Core = struct {
         try stream.write(json_core);
     }
 
-    // test "json: roundtrip" {
-    //     const expected: Core = .{
-    //         .max_size_upload = 50000000,
-    //         .max_concurrent_upload = 8,
-    //         .max_size_request = 10000000,
-    //         .max_concurrent_requests = 8,
-    //         .max_calls_in_request = 32,
-    //         .max_objects_in_get = 256,
-    //         .max_objects_in_set = 128,
-    //         .collation_algorithms = &.{
-    //             "i;ascii-numeric",
-    //             "i;ascii-casemap",
-    //             "i;unicode-casemap",
-    //         },
-    //     };
-    //
-    //     const input =
-    //         \\{
-    //         \\  "maxSizeUpload": 50000000,
-    //         \\  "maxConcurrentUpload": 8,
-    //         \\  "maxSizeRequest": 10000000,
-    //         \\  "maxConcurrentRequests": 8,
-    //         \\  "maxCallsInRequest": 32,
-    //         \\  "maxObjectsInGet": 256,
-    //         \\  "maxObjectsInSet": 128,
-    //         \\  "collationAlgorithms": [
-    //         \\    "i;ascii-numeric",
-    //         \\    "i;ascii-casemap",
-    //         \\    "i;unicode-casemap"
-    //         \\  ]
-    //         \\}
-    //     ;
-    //     const allocator = std.testing.allocator;
-    //     const parsed = try json.parseFromSlice(Core, allocator, input, .{});
-    //     defer parsed.deinit();
-    //
-    //     try std.testing.expectEqualDeep(expected, parsed.value);
-    //
-    //     const out = try json.stringifyAlloc(allocator, parsed.value, .{});
-    //     defer allocator.free(out);
-    //
-    //     const rt_parsed = try json.parseFromSlice(Core, allocator, out, .{});
-    //     defer rt_parsed.deinit();
-    //     try std.testing.expectEqualDeep(expected, rt_parsed.value);
-    // }
+    test "json: roundtrip" {
+        const expected: Core = .{
+            .max_size_upload = 50000000,
+            .max_concurrent_upload = 8,
+            .max_size_request = 10000000,
+            .max_concurrent_requests = 8,
+            .max_calls_in_request = 32,
+            .max_objects_in_get = 256,
+            .max_objects_in_set = 128,
+            .collation_algorithms = &.{
+                "i;ascii-numeric",
+                "i;ascii-casemap",
+                "i;unicode-casemap",
+            },
+        };
+
+        const input =
+            \\{
+            \\  "maxSizeUpload": 50000000,
+            \\  "maxConcurrentUpload": 8,
+            \\  "maxSizeRequest": 10000000,
+            \\  "maxConcurrentRequests": 8,
+            \\  "maxCallsInRequest": 32,
+            \\  "maxObjectsInGet": 256,
+            \\  "maxObjectsInSet": 128,
+            \\  "collationAlgorithms": [
+            \\    "i;ascii-numeric",
+            \\    "i;ascii-casemap",
+            \\    "i;unicode-casemap"
+            \\  ]
+            \\}
+        ;
+        const allocator = std.testing.allocator;
+        const parsed = try json.parseFromSlice(Core, allocator, input, .{});
+        defer parsed.deinit();
+
+        try std.testing.expectEqualDeep(expected, parsed.value);
+
+        const out = try json.stringifyAlloc(allocator, parsed.value, .{});
+        defer allocator.free(out);
+
+        const rt_parsed = try json.parseFromSlice(Core, allocator, out, .{});
+        defer rt_parsed.deinit();
+        try std.testing.expectEqualDeep(expected, rt_parsed.value);
+    }
 };
