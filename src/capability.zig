@@ -6,6 +6,8 @@ pub const Urn = []const u8;
 
 pub const core: Urn = "urn:ietf:params:jmap:core";
 pub const mail: Urn = "urn:ietf:params:jmap:mail";
+pub const submission: Urn = "urn:ietf:params:jmap:submission";
+pub const vacation_response: Urn = "urn:ietf:params:jmap:vacation_response";
 
 pub const Core = struct {
     max_size_upload: u53,
@@ -122,5 +124,48 @@ pub const Core = struct {
         const rt_parsed = try json.parseFromSlice(Core, allocator, out, .{});
         defer rt_parsed.deinit();
         try std.testing.expectEqualDeep(expected, rt_parsed.value);
+    }
+};
+
+pub const Mail = struct {
+    max_mailboxes_per_email: ?u53,
+    max_mailbox_depth: ?u53,
+    max_size_mailbox_name: u53,
+    max_size_attachments_per_email: u53,
+    email_query_sort_options: []const []const u8,
+    may_create_top_level_mailbox: bool,
+
+    const JsonMail = struct {
+        maxMailboxesPerEmail: ?u53,
+        maxMailboxDepth: ?u53,
+        maxSizeMailboxName: u53,
+        maxSizeAttachmentsPerEmail: u53,
+        emailQuerySortOptions: []const []const u8,
+        mayCreateTopLevelMailbox: bool,
+    };
+
+    pub fn jsonParse(
+        allocator: std.mem.Allocator,
+        source: anytype,
+        options: json.ParseOptions,
+    ) !Mail {
+        const parsed = try json.parseFromTokenSource(JsonMail, allocator, source, options);
+        return jsonParseFromValue(allocator, parsed.value, options);
+    }
+
+    pub fn jsonParseFromValue(
+        allocator: std.mem.Allocator,
+        source: json.Value,
+        options: json.ParseOptions,
+    ) !Mail {
+        const parsed = try json.parseFromValue(JsonMail, allocator, source, options);
+        return .{
+            .max_mailboxes_per_email = parsed.value.maxMailboxesPerEmail,
+            .max_mailbox_depth = parsed.value.maxMailboxDepth,
+            .max_size_mailbox_name = parsed.value.maxSizeMailboxName,
+            .max_size_attachments_per_email = parsed.value.maxSizeAttachmentsPerEmail,
+            .email_query_sort_options = parsed.value.emailQuerySortOptions,
+            .may_create_top_level_mailbox = parsed.value.mayCreateTopLevelMailbox,
+        };
     }
 };

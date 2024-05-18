@@ -91,24 +91,24 @@ pub fn getSession(self: *Client) !void {
     self.api_uri = try std.Uri.parse(self.session.?.api_url);
 }
 
-// test "client" {
-//     const capability = @import("capability.zig");
-//     const Mailbox = @import("mail/Mailbox.zig");
-//     const allocator = std.testing.allocator;
-//     var client = try init(allocator, "https://api.fastmail.com/jmap/session/", "REDACTED");
-//     defer client.deinit();
-//     try client.getSession();
-//     const mail_account = client.session.?.primary_accounts.map.get(capability.mail) orelse return error.NoAccount;
-//     const mailbox_get: Mailbox.Get.Request = .{
-//         .account_id = mail_account,
-//         .call_id = "1",
-//         .ids = null,
-//         .properties = &.{"role"},
-//     };
-//     const request: Request = .{
-//         .using = &.{ capability.core, capability.mail },
-//         .method_calls = &.{.{ .@"Mailbox/get" = mailbox_get }},
-//         .created_ids = null,
-//     };
-//     _ = try client.do(request);
-// }
+test "client" {
+    const capability = @import("capability.zig");
+    const Mailbox = @import("mail/Mailbox.zig");
+    const allocator = std.testing.allocator;
+    var client = try init(allocator, "https://api.fastmail.com/jmap/session/", "");
+    defer client.deinit();
+    try client.getSession();
+    const mail_account = client.session.?.primary_accounts.map.get(capability.mail) orelse return error.NoAccount;
+    const mailbox_get: Mailbox.Get.Request = .{
+        .account_id = mail_account,
+        .call_id = "1",
+        .ids = null,
+        .properties = &.{"role"},
+    };
+    const request: Request = .{
+        .using = &.{ capability.core, capability.mail },
+        .method_calls = &.{.{ .@"Mailbox/get" = mailbox_get }},
+        .created_ids = null,
+    };
+    _ = try client.do(request);
+}

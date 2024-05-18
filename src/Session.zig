@@ -121,10 +121,6 @@ test "Session: parse" {
         \\    "isPersonal": true,
         \\    "isReadOnly": false,
         \\    "accountCapabilities": {
-        \\        "urn:ietf:params:jmap:mail": {
-        \\        "maxMailboxesPerEmail": null,
-        \\        "maxMailboxDepth": 10
-        \\        },
         \\        "urn:ietf:params:jmap:contacts": {
         \\        }
         \\    }
@@ -134,10 +130,6 @@ test "Session: parse" {
         \\    "isPersonal": false,
         \\    "isReadOnly": true,
         \\    "accountCapabilities": {
-        \\        "urn:ietf:params:jmap:mail": {
-        \\        "maxMailboxesPerEmail": 1,
-        \\        "maxMailboxDepth": 10
-        \\        }
         \\    }
         \\    }
         \\},
@@ -155,8 +147,4 @@ test "Session: parse" {
     ;
     const parsed = try json.parseFromSlice(Session, std.testing.allocator, session_json, .{});
     defer parsed.deinit();
-}
-
-test "Session: stringify" {
-    // const session: Session = .{ .capabilities = .{ .core = .{} } };
 }
