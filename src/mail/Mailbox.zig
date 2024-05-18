@@ -19,16 +19,7 @@ pub const Role = enum {
     trash,
 };
 
-id: Id,
-name: ?[]const u8,
-parent_id: ?Id,
-role: ?Role,
-sort_order: ?u32,
-total_emails: ?u53,
-unread_emails: ?u53,
-total_threads: ?u53,
-unread_threads: ?u53,
-my_rights: ?struct {
+pub const Rights = struct {
     read_items: bool,
     add_items: bool,
     remove_items: bool,
@@ -38,7 +29,18 @@ my_rights: ?struct {
     rename: bool,
     delete: bool,
     submit: bool,
-} = null,
+};
+
+id: Id,
+name: ?[]const u8,
+parent_id: ?Id,
+role: ?Role,
+sort_order: ?u32,
+total_emails: ?u53,
+unread_emails: ?u53,
+total_threads: ?u53,
+unread_threads: ?u53,
+my_rights: ?Rights,
 is_subscribed: ?bool,
 
 pub fn jsonParseFromValue(
@@ -70,6 +72,22 @@ pub fn jsonParseFromValue(
         isSubscribed: ?bool = null,
     };
     const parsed = try json.parseFromValue(JsonMailbox, allocator, source, options);
+
+    const rights: ?Rights = if (parsed.value.myRights) |rights|
+        .{
+            .read_items = rights.mayReadItems,
+            .add_items = rights.mayAddItems,
+            .remove_items = rights.mayRemoveItems,
+            .set_seen = rights.maySetSeen,
+            .set_keywords = rights.maySetKeywords,
+            .create_child = rights.mayCreateChild,
+            .rename = rights.mayRename,
+            .delete = rights.mayDelete,
+            .submit = rights.maySubmit,
+        }
+    else
+        null;
+
     return .{
         .id = parsed.value.id,
         .name = parsed.value.name,
@@ -80,18 +98,7 @@ pub fn jsonParseFromValue(
         .unread_emails = parsed.value.unreadEmails,
         .total_threads = parsed.value.totalThreads,
         .unread_threads = parsed.value.unreadEmails,
-        // .my_rights = .{
-        //     .read_items = parsed.value.myRights.mayReadItems,
-        //     .add_items = parsed.value.myRights.mayAddItems,
-        //     .remove_items = parsed.value.myRights.mayRemoveItems,
-        //     .set_seen = parsed.value.myRights.maySetSeen,
-        //     .set_keywords = parsed.value.myRights.maySetKeywords,
-        //     .create_child = parsed.value.myRights.mayCreateChild,
-        //     .rename = parsed.value.myRights.mayRename,
-        //     .delete = parsed.value.myRights.mayDelete,
-        //     .submit = parsed.value.myRights.maySubmit,
-        // },
-        .my_rights = null,
+        .my_rights = rights,
         .is_subscribed = parsed.value.isSubscribed,
     };
 }
