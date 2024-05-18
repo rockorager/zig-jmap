@@ -43,7 +43,7 @@ pub fn deinit(self: *Client) void {
     self.arena.deinit();
 }
 
-pub fn do(self: *Client, req: Request) !Response {
+pub fn do(self: *Client, req: Request) !json.Parsed(Response) {
     if (self.api_uri == null) try self.getSession();
     assert(self.api_uri != null); // api_uri not set during getSession
 
@@ -64,9 +64,7 @@ pub fn do(self: *Client, req: Request) !Response {
         .ok => {},
         else => return error.BadHttpRequest,
     }
-    const parsed = try json.parseFromSlice(Response, self.allocator, response.items, .{});
-    defer parsed.deinit();
-    return parsed.value;
+    return json.parseFromSlice(Response, self.allocator, response.items, .{});
 }
 
 /// connect to the endpoint and obtain the Session object
