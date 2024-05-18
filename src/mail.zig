@@ -1,1 +1,1 @@
-pub const Mailbox = @import("mail/Mailbox");
+pub const Mailbox = @import("mail/Mailbox.zig");
