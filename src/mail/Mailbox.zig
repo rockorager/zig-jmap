@@ -140,3 +140,59 @@ pub const Get = struct {
         }
     };
 };
+
+pub const Changes = struct {
+    pub const Request = struct {
+        account_id: Id,
+        since_state: []const u8,
+        max_changes: ?u53 = null,
+
+        pub fn jsonStringify(self: *const Request, stream: anytype) !void {
+            try stream.write(.{
+                .accountId = self.account_id,
+                .sinceState = self.self.since_state,
+                .maxChanges = self.max_changes,
+            });
+        }
+    };
+
+    pub const Response = struct {
+        account_id: Id,
+        old_state: []const u8,
+        new_state: []const u8,
+        has_more_changes: bool,
+        created: []Id,
+        updated: []Id,
+        destroyed: []Id,
+        updated_properties: ?[]const []const u8,
+
+        pub fn jsonParseFromValue(
+            allocator: std.mem.Allocator,
+            source: json.Value,
+            options: json.ParseOptions,
+        ) !Response {
+            const JsonResponse = struct {
+                accountId: Id,
+                oldState: []const u8,
+                newState: []const u8,
+                hasMoreChanges: bool,
+                created: []Id,
+                updated: []Id,
+                destroyed: []Id,
+                updatedProperties: ?[]const []const u8 = null,
+            };
+
+            const parsed = try json.parseFromValue(JsonResponse, allocator, source, options);
+            return .{
+                .account_id = parsed.value.accountId,
+                .old_state = parsed.value.oldState,
+                .new_state = parsed.value.newState,
+                .has_more_changes = parsed.value.hasMoreChanges,
+                .created = parsed.value.created,
+                .updated = parsed.value.updated,
+                .destroyed = parsed.value.destroyed,
+                .updated_properties = parsed.value.updatedProperties,
+            };
+        }
+    };
+};
